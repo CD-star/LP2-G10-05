@@ -1,0 +1,126 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Curso;
+class Estudiante;
+
+class Curso {
+private:
+    string nombre;
+    string codigo;
+    string descripcion;
+    string fechaInicio;
+    string fechaFin;
+    vector<Estudiante*> estudiantes;
+
+public:
+    Curso(string nombre, string codigo, string descripcion, string fechaInicio, string fechaFin) :
+        nombre(nombre), codigo(codigo), descripcion(descripcion), fechaInicio(fechaInicio), fechaFin(fechaFin) {}
+
+    string getNombre() const { return nombre; }
+    string getCodigo() const { return codigo; }
+
+    void agregarEstudiante(Estudiante* estudiante) {
+        estudiantes.push_back(estudiante);
+        estudiante->agregarCurso(this); 
+    }
+
+    void eliminarEstudiante(Estudiante* estudiante) {
+        for (size_t i = 0; i < estudiantes.size(); ++i) {
+            if (estudiantes[i] == estudiante) {
+                estudiantes.erase(estudiantes.begin() + i);
+                estudiante->eliminarCurso(this); 
+                break;
+            }
+        }
+    }
+
+    void imprimirEstudiantes() const {
+        cout << "Estudiantes en el curso " << nombre << " (" << codigo << "):" << endl;
+        for (const auto& estudiante : estudiantes) {
+            cout << "- " << estudiante->getNombre() << endl;
+        }
+    }
+};
+
+class Estudiante {
+private:
+    string nombre;
+    string apellido;
+    string numeroIdentificacion;
+    string correoElectronico;
+    vector<Curso*> cursos;
+
+public:
+    Estudiante(string nombre, string apellido, string numeroIdentificacion, string correoElectronico) :
+        nombre(nombre), apellido(apellido), numeroIdentificacion(numeroIdentificacion), correoElectronico(correoElectronico) {}
+
+    string getNombre() const { return nombre; }
+    string getApellido() const { return apellido; }
+
+    void agregarCurso(Curso* curso) {
+        cursos.push_back(curso);
+    }
+
+    void eliminarCurso(Curso* curso) {
+        for (size_t i = 0; i < cursos.size(); ++i) {
+            if (cursos[i] == curso) {
+                cursos.erase(cursos.begin() + i);
+                break;
+            }
+        }
+    }
+
+    void imprimirCursos() const {
+        cout << "Cursos del estudiante " << nombre << " " << apellido << ":" << endl;
+        for (const auto& curso : cursos) {
+            cout << "- " << curso->getNombre() << " (" << curso->getCodigo() << ")" << endl;
+        }
+    }
+};
+
+int main() {
+    
+    Estudiante* estudiante1 = new Estudiante("Juan", "Perez", "12345", "juan.perez@example.com");
+    Estudiante* estudiante2 = new Estudiante("Maria", "Rodriguez", "67890", "maria.rodriguez@example.com");
+    Estudiante* estudiante3 = new Estudiante("Carlos", "Gomez", "13579", "carlos.gomez@example.com");
+
+    Curso* curso1 = new Curso("Programación II", "CS102", "Curso de programación orientada a objetos", "2024-08-15", "2024-12-15");
+    Curso* curso2 = new Curso("Base de Datos", "IS201", "Introducción a bases de datos relacionales", "2024-08-15", "2024-12-15");
+
+    curso1->agregarEstudiante(estudiante1);
+    curso1->agregarEstudiante(estudiante2);
+    curso2->agregarEstudiante(estudiante2);
+    curso2->agregarEstudiante(estudiante3);
+
+    curso1->imprimirEstudiantes();
+    cout << endl;
+    curso2->imprimirEstudiantes();
+    cout << endl;
+    estudiante1->imprimirCursos();
+    cout << endl;
+    estudiante2->imprimirCursos();
+    cout << endl;
+    estudiante3->imprimirCursos();
+    cout << endl;
+
+    curso1->eliminarEstudiante(estudiante1);
+    estudiante2->eliminarCurso(curso2);
+
+    cout << "Después de eliminar:" << endl;
+    curso1->imprimirEstudiantes();
+    cout << endl;
+    estudiante2->imprimirCursos();
+    cout << endl;
+
+    delete estudiante1;
+    delete estudiante2;
+    delete estudiante3;
+    delete curso1;
+    delete curso2;
+
+    return 0;
+}

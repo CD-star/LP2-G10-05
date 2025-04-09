@@ -1,0 +1,154 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Libro;
+class Autor;
+class Usuario;
+
+class Libro {
+private:
+    string ISBN;
+    string titulo;
+    int anioPublicacion;
+    int cantidadEjemplares;
+    Autor* autor; 
+public:
+    Libro(string ISBN, string titulo, int anioPublicacion, int cantidadEjemplares, Autor* autor) :
+        ISBN(ISBN), titulo(titulo), anioPublicacion(anioPublicacion), cantidadEjemplares(cantidadEjemplares), autor(autor) {}
+
+    string getISBN() const { return ISBN; }
+    string getTitulo() const { return titulo; }
+    int getAnioPublicacion() const { return anioPublicacion; }
+    int getCantidadEjemplares() const { return cantidadEjemplares; }
+    Autor* getAutor() const { return autor; }
+
+    void mostrarInformacion() const {
+        cout << "Libro: " << titulo << " (ISBN: " << ISBN << ")" << endl;
+        cout << "  Anio: " << anioPublicacion << ", Ejemplares: " << cantidadEjemplares << endl;
+        cout << "  Autor: " << autor->getNombre() << endl;
+    }
+};
+
+class Autor {
+private:
+    string nombre;
+    string nacionalidad;
+    vector<Libro*> librosEscritos; 
+
+public:
+    Autor(string nombre, string nacionalidad) : nombre(nombre), nacionalidad(nacionalidad) {}
+
+    string getNombre() const { return nombre; }
+    string getNacionalidad() const { return nacionalidad; }
+
+    void agregarLibro(Libro* libro) {
+        librosEscritos.push_back(libro);
+    }
+
+    void mostrarInformacion() const {
+        cout << "Autor: " << nombre << " (" << nacionalidad << ")" << endl;
+    }
+
+    void mostrarLibros() const {
+        cout << "Libros escritos por " << nombre << ":" << endl;
+        for (const auto& libro : librosEscritos) {
+            cout << "- " << libro->getTitulo() << endl;
+        }
+    }
+};
+
+class Usuario {
+private:
+    string nombre;
+    string direccion;
+    string numeroTelefono;
+    vector<pair<Libro*, pair<string, string>>> librosPrestados; 
+
+public:
+    Usuario(string nombre, string direccion, string numeroTelefono) :
+        nombre(nombre), direccion(direccion), numeroTelefono(numeroTelefono) {}
+
+    string getNombre() const { return nombre; }
+
+    void prestarLibro(Libro* libro, string fechaPrestamo) {
+        librosPrestados.push_back(make_pair(libro, make_pair(fechaPrestamo, "")));
+    }
+
+    void devolverLibro(Libro* libro, string fechaDevolucion) {
+        for (auto& par : librosPrestados) {
+            if (par.first == libro && par.second.second.empty()) {
+                par.second.second = fechaDevolucion;
+                break;
+            }
+        }
+    }
+
+    void mostrarLibrosPrestados() const {
+        cout << "Libros prestados a " << nombre << ":" << endl;
+        for (const auto& par : librosPrestados) {
+            cout << "- " << par.first->getTitulo()
+                 << " (Prestado: " << par.second.first
+                 << ", Devuelto: " << (par.second.second.empty() ? "No devuelto" : par.second.second) << ")" << endl;
+        }
+    }
+
+    void mostrarInformacion() const {
+        cout << "Usuario: " << nombre << ", Direccion: " << direccion << ", Telefono: " << numeroTelefono << endl;
+    }
+};
+
+int main() {
+ 
+    Autor* autor1 = new Autor("Gabriel Garcia Marquez", "Colombiano");
+    Autor* autor2 = new Autor("Julio Cortazar", "Argentino");
+
+    Libro* libro1 = new Libro("978-0307474278", "Cien años de soledad", 1967, 5, autor1);
+    Libro* libro2 = new Libro("978-0307950376", "Rayuela", 1963, 3, autor2);
+
+    autor1->agregarLibro(libro1);
+    autor2->agregarLibro(libro2);
+
+    Usuario* usuario1 = new Usuario("Laura Perez", "Calle A, 123", "555-1234");
+    Usuario* usuario2 = new Usuario("Carlos Gomez", "Av. B, 456", "555-5678");
+
+    usuario1->prestarLibro(libro1, "2024-07-01");
+    usuario2->prestarLibro(libro2, "2024-07-05");
+
+    usuario1->devolverLibro(libro1, "2024-07-15");
+
+    cout << "Informacion de la Biblioteca:" << endl;
+
+    cout << "\nAutores:" << endl;
+    autor1->mostrarInformacion();
+    autor1->mostrarLibros();
+    cout << endl;
+    autor2->mostrarInformacion();
+    autor2->mostrarLibros();
+    cout << endl;
+
+    cout << "\nLibros:" << endl;
+    libro1->mostrarInformacion();
+    cout << endl;
+    libro2->mostrarInformacion();
+    cout << endl;
+
+    cout << "\nUsuarios:" << endl;
+    usuario1->mostrarInformacion();
+    usuario1->mostrarLibrosPrestados();
+    cout << endl;
+    usuario2->mostrarInformacion();
+    usuario2->mostrarLibrosPrestados();
+    cout << endl;
+
+    delete autor1;
+    delete autor2;
+    delete libro1;
+    delete libro2;
+    delete usuario1;
+    delete usuario2;
+
+    return 0;
+}

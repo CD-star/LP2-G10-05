@@ -1,0 +1,114 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Estudiante;
+class Docente;
+class Curso;
+class Asociacion;
+
+class Estudiante {
+private:
+    string nombre;
+    int edad;
+    string matricula;
+
+public:
+    Estudiante(string nombre, int edad, string matricula) : nombre(nombre), edad(edad), matricula(matricula) {}
+
+    string getNombre() const { return nombre; }
+    int getEdad() const { return edad; }
+    string getMatricula() const { return matricula; }
+
+    void mostrarInformacion() const {
+        cout << "Estudiante: " << nombre << ", Edad: " << edad << ", Matricula: " << matricula << endl;
+    }
+};
+
+class Docente {
+private:
+    string nombre;
+    string especialidad;
+    string codigoEmpleado;
+
+public:
+    Docente(string nombre, string especialidad, string codigoEmpleado) : nombre(nombre), especialidad(especialidad), codigoEmpleado(codigoEmpleado) {}
+
+    string getNombre() const { return nombre; }
+    string getEspecialidad() const { return especialidad; }
+    string getCodigoEmpleado() const { return codigoEmpleado; }
+
+    void mostrarInformacion() const {
+        cout << "Docente: " << nombre << ", Especialidad: " << especialidad << ", Codigo: " << codigoEmpleado << endl;
+    }
+};
+
+class Curso {
+private:
+    string nombre;
+    string codigo;
+    int creditos;
+
+public:
+    Curso(string nombre, string codigo, int creditos) : nombre(nombre), codigo(codigo), creditos(creditos) {}
+
+    string getNombre() const { return nombre; }
+    string getCodigo() const { return codigo; }
+    int getCreditos() const { return creditos; }
+
+    void mostrarInformacion() const {
+        cout << "Curso: " << nombre << ", Codigo: " << codigo << ", Creditos: " << creditos << endl;
+    }
+};
+
+class Asociacion {
+private:
+    Estudiante* estudiante;
+    Docente* docente;
+    Curso* curso;
+
+public:
+    Asociacion(Estudiante* estudiante, Docente* docente, Curso* curso) :
+        estudiante(estudiante), docente(docente), curso(curso) {}
+
+    void mostrarInformacion() const {
+        cout << "Asociacion:" << endl;
+        estudiante->mostrarInformacion();
+        docente->mostrarInformacion();
+        curso->mostrarInformacion();
+    }
+};
+
+int main() {
+
+    Estudiante* estudiante1 = new Estudiante("Ana Perez", 20, "20211001");
+    Estudiante* estudiante2 = new Estudiante("Luis Gomez", 22, "20201002");
+
+    Docente* docente1 = new Docente("Dr. Juan Rodriguez", "Matematicas", "PROF001");
+    Docente* docente2 = new Docente("Dra. Maria Sanchez", "Fisica", "PROF002");
+
+    Curso* curso1 = new Curso("Calculo I", "MAT101", 5);
+    Curso* curso2 = new Curso("Fisica General", "FIS101", 4);
+
+    Asociacion* asociacion1 = new Asociacion(estudiante1, docente1, curso1);
+    Asociacion* asociacion2 = new Asociacion(estudiante2, docente2, curso2);
+
+    cout << "Informacion de las Asociaciones:" << endl;
+    asociacion1->mostrarInformacion();
+    cout << endl;
+    asociacion2->mostrarInformacion();
+    cout << endl;
+
+    delete estudiante1;
+    delete estudiante2;
+    delete docente1;
+    delete docente2;
+    delete curso1;
+    delete curso2;
+    delete asociacion1;
+    delete asociacion2;
+
+    return 0;
+}

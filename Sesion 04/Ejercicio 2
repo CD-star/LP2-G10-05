@@ -1,0 +1,201 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Cliente;
+class Producto;
+class Venta;
+class Proveedor;
+class Pago;
+
+class Cliente {
+private:
+    string nombre;
+    string direccion;
+    string numeroTelefono;
+    vector<Venta*> comprasRealizadas;
+
+public:
+    Cliente(string nombre, string direccion, string numeroTelefono) :
+        nombre(nombre), direccion(direccion), numeroTelefono(numeroTelefono) {}
+
+    string getNombre() const { return nombre; }
+    string getDireccion() const { return direccion; }
+    string getNumeroTelefono() const { return numeroTelefono; }
+
+    void agregarCompra(Venta* venta) {
+        comprasRealizadas.push_back(venta);
+    }
+
+    void mostrarCompras() const {
+        cout << "Compras realizadas por " << nombre << ":" << endl;
+        for (const auto& venta : comprasRealizadas) {
+            cout << "- Factura: " << venta->getNumeroFactura() << ", Fecha: " << venta->getFecha() << endl;
+        }
+    }
+
+    void mostrarInformacion() const {
+        cout << "Cliente: " << nombre << ", Direccion: " << direccion << ", Telefono: " << numeroTelefono << endl;
+    }
+};
+
+class Producto {
+private:
+    string codigo;
+    string descripcion;
+    double precio;
+    Proveedor* proveedor;
+
+public:
+    Producto(string codigo, string descripcion, double precio, Proveedor* proveedor) :
+        codigo(codigo), descripcion(descripcion), precio(precio), proveedor(proveedor) {}
+
+    string getCodigo() const { return codigo; }
+    string getDescripcion() const { return descripcion; }
+    double getPrecio() const { return precio; }
+    Proveedor* getProveedor() const { return proveedor; }
+
+    void mostrarInformacion() const {
+        cout << "Producto: " << descripcion << " (Codigo: " << codigo << ")" << endl;
+        cout << "  Precio: $" << precio << ", Proveedor: " << proveedor->getNombre() << endl;
+    }
+};
+
+class Proveedor {
+private:
+    string nombre;
+    string direccion;
+    string telefono;
+
+public:
+    Proveedor(string nombre, string direccion, string telefono) :
+        nombre(nombre), direccion(direccion), telefono(telefono) {}
+
+    string getNombre() const { return nombre; }
+    string getDireccion() const { return direccion; }
+    string getTelefono() const { return telefono; }
+
+    void mostrarInformacion() const {
+        cout << "Proveedor: " << nombre << ", Direccion: " << direccion << ", Telefono: " << telefono << endl;
+    }
+};
+
+class Venta {
+private:
+    string numeroFactura;
+    string fecha;
+    Cliente* cliente;
+    vector<pair<Producto*, int>> productosVendidos; 
+
+public:
+    Venta(string numeroFactura, string fecha, Cliente* cliente) :
+        numeroFactura(numeroFactura), fecha(fecha), cliente(cliente) {
+        cliente->agregarCompra(this);
+    }
+
+    string getNumeroFactura() const { return numeroFactura; }
+    string getFecha() const { return fecha; }
+    Cliente* getCliente() const { return cliente; }
+
+    void agregarProducto(Producto* producto, int cantidad) {
+        productosVendidos.push_back(make_pair(producto, cantidad));
+    }
+
+    double calcularTotal() const {
+        double total = 0.0;
+        for (const auto& par : productosVendidos) {
+            total += par.first->getPrecio() * par.second;
+        }
+        return total;
+    }
+
+    void mostrarInformacion() const {
+        cout << "Venta (Factura: " << numeroFactura << ", Fecha: " << fecha << ")" << endl;
+        cout << "  Cliente: " << cliente->getNombre() << endl;
+        cout << "  Productos:" << endl;
+        for (const auto& par : productosVendidos) {
+            cout << "  - " << par.first->getDescripcion() << " (Cantidad: " << par.second << ")" << endl;
+        }
+        cout << "  Total: $" << calcularTotal() << endl;
+    }
+};
+
+class Pago {
+private:
+    string fecha;
+    double monto;
+    Cliente* cliente;
+
+public:
+    Pago(string fecha, double monto, Cliente* cliente) :
+        fecha(fecha), monto(monto), cliente(cliente) {}
+
+    void mostrarInformacion() const {
+        cout << "Pago: Fecha: " << fecha << ", Monto: $" << monto << ", Cliente: " << cliente->getNombre() << endl;
+    }
+};
+
+int main() {
+
+    Proveedor* proveedor1 = new Proveedor("Textiles S.A.", "Calle Principal 123", "555-1111");
+    Proveedor* proveedor2 = new Proveedor("Moda Express", "Avenida Central 456", "555-2222");
+
+    Producto* producto1 = new Producto("CAM001", "Camiseta Algodon", 25.0, proveedor1);
+    Producto* producto2 = new Producto("PANT002", "Pantalon Jeans", 50.0, proveedor2);
+
+    Cliente* cliente1 = new Cliente("Ana Perez", "Calle A, 123", "555-3333");
+    Cliente* cliente2 = new Cliente("Luis Gomez", "Avenida B, 456", "555-4444");
+
+    Venta* venta1 = new Venta("FAC001", "2024-07-20", cliente1);
+    venta1->agregarProducto(producto1, 2);
+    venta1->agregarProducto(producto2, 1);
+
+    Venta* venta2 = new Venta("FAC002", "2024-07-21", cliente2);
+    venta2->agregarProducto(producto2, 2);
+
+    Pago* pago1 = new Pago("2024-07-25", 75.0, cliente1);
+    Pago* pago2 = new Pago("2024-07-26", 100.0, cliente2);
+
+    cout << "Sistema de Gestion de Tienda de Ropa:" << endl;
+
+    cout << "\nProveedores:" << endl;
+    proveedor1->mostrarInformacion();
+    proveedor2->mostrarInformacion();
+
+    cout << "\nProductos:" << endl;
+    producto1->mostrarInformacion();
+    producto2->mostrarInformacion();
+
+    cout << "\nClientes:" << endl;
+    cliente1->mostrarInformacion();
+    cliente1->mostrarCompras();
+    cout << endl;
+    cliente2->mostrarInformacion();
+    cliente2->mostrarCompras();
+    cout << endl;
+
+    cout << "\nVentas:" << endl;
+    venta1->mostrarInformacion();
+    cout << endl;
+    venta2->mostrarInformacion();
+    cout << endl;
+
+    cout << "\nPagos:" << endl;
+    pago1->mostrarInformacion();
+    pago2->mostrarInformacion();
+
+    delete proveedor1;
+    delete proveedor2;
+    delete producto1;
+    delete producto2;
+    delete cliente1;
+    delete cliente2;
+    delete venta1;
+    delete venta2;
+    delete pago1;
+    delete pago2;
+
+    return 0;
+}

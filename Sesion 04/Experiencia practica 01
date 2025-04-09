@@ -1,0 +1,72 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Hijo; 
+
+class Padre {
+private:
+    string nombre;
+    Hijo* hijos[5]; // Arreglo de objetos Hijo
+    int numHijos;
+    static const int maxHijos = 5; // Tamaño máximo del arreglo
+
+public:
+    Padre(string nombre) : nombre(nombre), numHijos(0) {}
+
+    string getNombre() const {
+        return nombre;
+    }
+
+    void setNombre(const string& nombre) {
+        this->nombre = nombre;
+    }
+
+    bool agregarHijo(Hijo* hijo) {
+        if (numHijos < maxHijos) {
+            hijos[numHijos] = hijo;
+            numHijos++;
+            return true;
+        } else {
+            cout << "No se pueden agregar más hijos." << endl;
+            return false;
+        }
+    }
+
+    void imprimirInfo() const {
+        cout << "Padre: " << nombre << ", Hijos: " << numHijos << endl;
+    }
+};
+
+class Hijo {
+private:
+    string nombre;
+
+public:
+    Hijo(string nombre) : nombre(nombre) {}
+
+    string getNombre() const {
+        return nombre;
+    }
+
+    void setNombre(const string& nombre) {
+        this->nombre = nombre;
+    }
+};
+
+int main() {
+    Padre padre("Ricardo");
+
+    Hijo hijo1("Junior");
+    Hijo hijo2("Carlos");
+    Hijo hijo3("Andres");
+
+    padre.agregarHijo(&hijo1);
+    padre.agregarHijo(&hijo2);
+    padre.agregarHijo(&hijo3);
+
+    padre.imprimirInfo();
+
+    return 0;
+}

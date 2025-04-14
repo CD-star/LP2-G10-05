@@ -1,0 +1,167 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Estudiante;
+class Profesor;
+class Asignatura;
+
+class Estudiante {
+private:
+    string nombre;
+    string direccion;
+    string numeroMatricula;
+    vector<pair<Asignatura*, pair<int, int>>> asignaturasMatriculadas; 
+
+public:
+    Estudiante(string nombre, string direccion, string numeroMatricula) :
+        nombre(nombre), direccion(direccion), numeroMatricula(numeroMatricula) {}
+
+    string getNombre() const { return nombre; }
+    string getNumeroMatricula() const { return numeroMatricula; }
+
+    void matricularAsignatura(Asignatura* asignatura) {
+        asignaturasMatriculadas.push_back(make_pair(asignatura, make_pair(0, 0))); 
+    }
+
+    void setNota(Asignatura* asignatura, int nota) {
+        for (auto& par : asignaturasMatriculadas) {
+            if (par.first == asignatura) {
+                par.second.first = nota;
+                return;
+            }
+        }
+    }
+
+    void setFaltas(Asignatura* asignatura, int faltas) {
+        for (auto& par : asignaturasMatriculadas) {
+            if (par.first == asignatura) {
+                par.second.second = faltas;
+                return;
+            }
+        }
+    }
+
+    void mostrarAsignaturas() const {
+        cout << "Asignaturas matriculadas por " << nombre << ":" << endl;
+        for (const auto& par : asignaturasMatriculadas) {
+            cout << "- " << par.first->getNombre()
+                 << " (Nota: " << par.second.first
+                 << ", Faltas: " << par.second.second << ")" << endl;
+        }
+    }
+
+    void mostrarInformacion() const {
+        cout << "Estudiante: " << nombre << ", Direccion: " << direccion << ", Matricula: " << numeroMatricula << endl;
+    }
+};
+
+class Profesor {
+private:
+    string nombre;
+    string direccion;
+    string numeroTelefono;
+    vector<Asignatura*> asignaturasImpartidas;
+
+public:
+    Profesor(string nombre, string direccion, string numeroTelefono) :
+        nombre(nombre), direccion(direccion), numeroTelefono(numeroTelefono) {}
+
+    string getNombre() const { return nombre; }
+
+    void agregarAsignatura(Asignatura* asignatura) {
+        asignaturasImpartidas.push_back(asignatura);
+    }
+
+    void mostrarAsignaturas() const {
+        cout << "Asignaturas impartidas por " << nombre << ":" << endl;
+        for (const auto& asignatura : asignaturasImpartidas) {
+            cout << "- " << asignatura->getNombre() << endl;
+        }
+    }
+
+    void mostrarInformacion() const {
+        cout << "Profesor: " << nombre << ", Direccion: " << direccion << ", Telefono: " << numeroTelefono << endl;
+    }
+};
+
+class Asignatura {
+private:
+    string codigo;
+    string nombre;
+    string descripcion;
+    Profesor* profesor;
+
+public:
+    Asignatura(string codigo, string nombre, string descripcion, Profesor* profesor) :
+        codigo(codigo), nombre(nombre), descripcion(descripcion), profesor(profesor) {
+        profesor->agregarAsignatura(this);
+    }
+
+    string getCodigo() const { return codigo; }
+    string getNombre() const { return nombre; }
+
+    void mostrarInformacion() const {
+        cout << "Asignatura: " << nombre << " (Codigo: " << codigo << ")" << endl;
+        cout << "  Descripcion: " << descripcion << endl;
+        cout << "  Profesor: " << profesor->getNombre() << endl;
+    }
+};
+
+int main() {
+
+    Profesor* profesor1 = new Profesor("Dr. Juan Perez", "Calle A, 123", "555-1111");
+    Profesor* profesor2 = new Profesor("Dra. Maria Gomez", "Avenida B, 456", "555-2222");
+
+    Asignatura* asignatura1 = new Asignatura("MAT101", "Calculo I", "Introduccion al calculo", profesor1);
+    Asignatura* asignatura2 = new Asignatura("FIS101", "Fisica General", "Principios basicos de la fisica", profesor2);
+
+    Estudiante* estudiante1 = new Estudiante("Carlos Rodriguez", "Calle C, 789", "20211001");
+    Estudiante* estudiante2 = new Estudiante("Laura Sanchez", "Avenida D, 012", "20222002");
+
+    estudiante1->matricularAsignatura(asignatura1);
+    estudiante1->matricularAsignatura(asignatura2);
+    estudiante2->matricularAsignatura(asignatura2);
+
+    estudiante1->setNota(asignatura1, 85);
+    estudiante1->setFaltas(asignatura1, 2);
+    estudiante1->setNota(asignatura2, 92);
+    estudiante1->setFaltas(asignatura2, 1);
+    estudiante2->setNota(asignatura2, 78);
+    estudiante2->setFaltas(asignatura2, 3);
+
+    cout << "Sistema de Gestion de Universidad:" << endl;
+
+    cout << "\nProfesores:" << endl;
+    profesor1->mostrarInformacion();
+    profesor1->mostrarAsignaturas();
+    cout << endl;
+    profesor2->mostrarInformacion();
+    profesor2->mostrarAsignaturas();
+    cout << endl;
+
+    cout << "\nAsignaturas:" << endl;
+    asignatura1->mostrarInformacion();
+    cout << endl;
+    asignatura2->mostrarInformacion();
+    cout << endl;
+
+    cout << "\nEstudiantes:" << endl;
+    estudiante1->mostrarInformacion();
+    estudiante1->mostrarAsignaturas();
+    cout << endl;
+    estudiante2->mostrarInformacion();
+    estudiante2->mostrarAsignaturas();
+    cout << endl;
+
+    delete profesor1;
+    delete profesor2;
+    delete asignatura1;
+    delete asignatura2;
+    delete estudiante1;
+    delete estudiante2;
+
+    return 0;
+}

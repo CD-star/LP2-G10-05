@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class AggregatedClass;
+
+class BaseClass {
+private:
+    vector<AggregatedClass*> collection;
+
+public:
+
+    void agregarObjeto(AggregatedClass* objeto) {
+        collection.push_back(objeto);
+    }
+
+    void eliminarObjeto(AggregatedClass* objeto) {
+        for (size_t i = 0; i < collection.size(); ++i) {
+            if (collection[i] == objeto) {
+                collection.erase(collection.begin() + i);
+                return;
+            }
+        }
+    }
+
+    AggregatedClass* obtenerObjeto(int id) {
+        for (AggregatedClass* objeto : collection) {
+            if (objeto->getId() == id) {
+                return objeto;
+            }
+        }
+        return nullptr; 
+    }
+
+    void mostrarObjetos() const {
+        cout << "Objetos en la coleccion:" << endl;
+        for (const auto& objeto : collection) {
+            objeto->mostrarInformacion();
+        }
+    }
+};
+
+class AggregatedClass {
+private:
+    int id;
+    string nombre;
+
+public:
+    AggregatedClass(int id, string nombre) : id(id), nombre(nombre) {}
+
+    int getId() const { return id; }
+    string getNombre() const { return nombre; }
+
+    void setNombre(const string& nombre) {
+        this->nombre = nombre;
+    }
+
+    void mostrarInformacion() const {
+        cout << "ID: " << id << ", Nombre: " << nombre << endl;
+    }
+};
+
+int main() {
+
+    BaseClass base;
+
+    AggregatedClass* objeto1 = new AggregatedClass(1, "Objeto 1");
+    AggregatedClass* objeto2 = new AggregatedClass(2, "Objeto 2");
+    AggregatedClass* objeto3 = new AggregatedClass(3, "Objeto 3");
+
+    base.agregarObjeto(objeto1);
+    base.agregarObjeto(objeto2);
+    base.agregarObjeto(objeto3);
+
+    cout << "Accediendo a los objetos de la coleccion:" << endl;
+    base.mostrarObjetos();
+    cout << endl;
+
+    AggregatedClass* objetoEncontrado = base.obtenerObjeto(2);
+    if (objetoEncontrado != nullptr) {
+        objetoEncontrado->setNombre("Objeto 2 Modificado");
+        cout << "Objeto 2 modificado:" << endl;
+        objetoEncontrado->mostrarInformacion();
+        cout << endl;
+    }
+
+    base.eliminarObjeto(objeto2);
+    cout << "Objetos despues de eliminar Objeto 2:" << endl;
+    base.mostrarObjetos();
+    cout << endl;
+
+    delete objeto1;
+    delete objeto3;
+
+    return 0;
+}

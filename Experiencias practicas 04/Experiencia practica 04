@@ -1,0 +1,105 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Trabajador; 
+
+const int MAX_TRABAJADORES = 5;
+
+class Trabajador {
+private:
+    string nombre;
+    int id;
+    Trabajador* companeros[MAX_TRABAJADORES];
+    int numCompaneros;
+
+public:
+    Trabajador(string nombre, int id) : nombre(nombre), id(id), numCompaneros(0) {}
+
+    string getNombre() const { return nombre; }
+    int getId() const { return id; }
+
+    bool agregarCompanero(Trabajador* trabajador) {
+        if (numCompaneros < MAX_TRABAJADORES) {
+            companeros[numCompaneros] = trabajador;
+            numCompaneros++;
+            return true;
+        } else {
+            cout << "No se pueden agregar mas companeros." << endl;
+            return false;
+        }
+    }
+
+    void mostrarCompaneros() const {
+        cout << "Companeros de " << nombre << ":" << endl;
+        for (int i = 0; i < numCompaneros; ++i) {
+            cout << "- " << companeros[i]->getNombre() << endl;
+        }
+    }
+
+    void mostrarInformacion() const {
+        cout << "Trabajador: " << nombre << ", ID: " << id << endl;
+    }
+};
+
+class Gerente : public Trabajador {
+private:
+    vector<Trabajador*> trabajadoresACargo;
+
+public:
+    Gerente(string nombre, int id) : Trabajador(nombre, id) {}
+
+    void agregarTrabajador(Trabajador* trabajador) {
+        trabajadoresACargo.push_back(trabajador);
+    }
+
+    void mostrarTrabajadoresACargo() const {
+        cout << "Trabajadores a cargo de " << getNombre() << ":" << endl;
+        for (const auto& trabajador : trabajadoresACargo) {
+            cout << "- " << trabajador->getNombre() << endl;
+        }
+    }
+};
+
+int main() {
+
+    Gerente* gerente = new Gerente("Ricardo Boss", 100);
+    Trabajador* trabajador1 = new Trabajador("Junior Developer", 1);
+    Trabajador* trabajador2 = new Trabajador("Carlos Backend", 2);
+    Trabajador* trabajador3 = new Trabajador("Andres Frontend", 3);
+
+    gerente->agregarTrabajador(trabajador1);
+    gerente->agregarTrabajador(trabajador2);
+    gerente->agregarTrabajador(trabajador3);
+
+    trabajador1->agregarCompanero(trabajador2);
+    trabajador1->agregarCompanero(trabajador3);
+    trabajador2->agregarCompanero(trabajador1);
+    trabajador3->agregarCompanero(trabajador1);
+
+    cout << "Sistema de Gestion de Trabajadores:" << endl;
+    gerente->mostrarInformacion();
+    gerente->mostrarTrabajadoresACargo();
+    cout << endl;
+
+    trabajador1->mostrarInformacion();
+    trabajador1->mostrarCompaneros();
+    cout << endl;
+
+    trabajador2->mostrarInformacion();
+    trabajador2->mostrarCompaneros();
+    cout << endl;
+
+    trabajador3->mostrarInformacion();
+    trabajador3->mostrarCompaneros();
+    cout << endl;
+
+    delete gerente;
+    delete trabajador1;
+    delete trabajador2;
+    delete trabajador3;
+
+    return 0;
+}
